@@ -213,7 +213,10 @@ void Application::Impl_::clickEvent( int button, int action, int mods )
  };
 	
  if( button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS ) {
-  if( IS_MOUSE_IN_RECTANGLE( xpos, ypos, exitLabelRect ) )  glfwSetWindowShouldClose( window_.get(), GL_TRUE );
+  if( isEnd_ ) {
+   if( IS_MOUSE_IN_RECTANGLE( xpos, ypos, exitLabelRect ) )   ExitApp();
+   if( IS_MOUSE_IN_RECTANGLE( xpos, ypos, retryLabelRect ) )  RestartGame();
+   }
   }
 }
 
@@ -244,8 +247,8 @@ void Application::Impl_::ExitApp()
 	glfwDestroyWindow(window_.get());
 }
 
-void Application::Impl_::RestartGame()
-{
+void Application::Impl_::RestartGame() {
+ isEnd_ = false;
 }
 
 Application::Application(int argc, char** argv):
