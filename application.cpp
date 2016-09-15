@@ -1,6 +1,9 @@
 #include "application.h"
 
 #include <core/board.h>
+
+#include "achievement.h"
+
 #include "boardview.h"
 #include "nvg.h"
 
@@ -8,6 +11,7 @@
 
 #include <random>
 #include <algorithm>
+#include <deque>
 
 #include <resources_path.h>
 
@@ -22,6 +26,9 @@ class Application::Impl_ : public non_copyable
 public:
 
 	Impl_();
+
+ std::vector<std::unique_ptr<Achievement>> m_Achievements;
+ std::deque<std::unique_ptr<achievement_print_t>> m_AchievementIndexToPrint;
 
 	std::unique_ptr<GLFWwindow,void(*)(GLFWwindow*)> window_;
 	std::unique_ptr<Board> board_;
@@ -105,6 +112,10 @@ void Application::Impl_::paintEvent(NVGcontext* context){
 	// draw the board
 	boardView_->paint(context,boardRect);
 
+ if( m_AchievementIndexToPrint.size() ) {
+ 
+ }
+
 	if (isEnd_){
 
 		// change the color of the board
@@ -151,7 +162,7 @@ void Application::Impl_::paintEvent(NVGcontext* context){
   nvgBeginPath( context );
 
   float xLabel = fWidth / 2.0f,
-   yLabel = fHeight / 2.0f + 20.0f;
+        yLabel = fHeight / 2.0f + 20.0f;
 
   textRect.center( x, y );
   nvgFontSize( context, 20 );
@@ -269,6 +280,13 @@ Application::Application(int argc, char** argv):
 	glfwWindowHint(GLFW_DEPTH_BITS, 16);
 	glfwMakeContextCurrent(impl_->window_.get());
 	glfwSwapInterval(0);
+
+
+ impl_->m_Achievements.push_back( std::unique_ptr<Achievement>( new Achievement( "Test", 
+                                                                                 "Test Achievement", 
+                                                                                 []() { 
+                                                                                  return true; 
+                                                                                 } ) ) );
 }
 
 Application::~Application(){
@@ -311,6 +329,14 @@ int Application::run()
 		if (!impl_->board_->isMovable() && !impl_->isEnd_){
 			impl_->isEnd_ = true;
 		}
+
+  for( int i = 0; i < impl_->m_Achievements.size(); ++i ) {
+   if( impl_->m_Achievements[i]->CheckAchievementState() ) {
+     impl_->m_AchievementIndexToPrint.push_back( std::unique_ptr<achievement_print_t>( new achievement_print_t( 60, i ) ) );
+    // affiche boite achievement
+    // save the achievement state to a file?
+   }
+  }
 	}
 	return 0;
 }
