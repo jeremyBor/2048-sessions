@@ -33,7 +33,7 @@ public:
 	static void clickCallBack(GLFWwindow* window, int button, int action, int mods);
 	void paintEvent(NVGcontext* context);
 	void keyEvent(int key, int scancode, int action, int mods);
-	void clickEvent();
+	void clickEvent( int button, int action, int mods );
 
 	void pushOnBoard(Board::Direction direction);
 
@@ -47,7 +47,7 @@ public:
 
 void Application::Impl_::clickCallBack(GLFWwindow* window, int button, int action, int mods)
 {
-	app->impl_->clickEvent();
+	app->impl_->clickEvent( button, action, mods );
 
 }
 
@@ -128,29 +128,93 @@ void Application::Impl_::paintEvent(NVGcontext* context){
 		nvgText(context,x+1,y+1,text.c_str(),NULL);
 		nvgFillColor(context, nvgRGBA(200,20,20,255));
 		nvgText(context,x,y,text.c_str(),NULL);
+
+  constexpr char* retryLabel = "RECOMMENCER";
+
+  nvgBeginPath( context );
+
+  float xRecommencer = fWidth / 2.0f,
+   yRecommencer = fHeight / 2.0f;
+
+  textRect.center( x, y );
+  nvgFontSize( context, 20 );
+  nvgFontFace( context, "sans" );
+  nvgTextAlign( context, NVG_ALIGN_MIDDLE | NVG_ALIGN_CENTER );
+  nvgFill( context );
+  nvgFillColor( context, nvgRGBA( 0, 0, 0, 255 ) );
+  nvgText( context, xRecommencer + 1, yRecommencer + 1, retryLabel, nullptr );
+  nvgFillColor( context, nvgRGBA( 200, 20, 20, 255 ) );
+  nvgText( context, xRecommencer, yRecommencer, retryLabel, nullptr );
+
+  constexpr char* exitLabel = "QUITTER";
+
+  nvgBeginPath( context );
+
+  float xLabel = fWidth / 2.0f,
+   yLabel = fHeight / 2.0f + 20.0f;
+
+  textRect.center( x, y );
+  nvgFontSize( context, 20 );
+  nvgFontFace( context, "sans" );
+  nvgTextAlign( context, NVG_ALIGN_MIDDLE | NVG_ALIGN_CENTER );
+  nvgFill( context );
+  nvgFillColor( context, nvgRGBA( 0, 0, 0, 255 ) );
+  nvgText( context, xLabel + 1, yLabel + 1, exitLabel, nullptr );
+  nvgFillColor( context, nvgRGBA( 200, 20, 20, 255 ) );
+  nvgText( context, xLabel, yLabel, exitLabel, nullptr );
 	}
 
 	nvgEndFrame(context);
 }
 
-void Application::Impl_::keyEvent(int key, int scancode, int action, int mods){
+void Application::Impl_::keyEvent( int key, int scancode, int action, int mods ) {
+ if( action == GLFW_PRESS ) {
+  switch( key ) {
+   case GLFW_KEY_UP: pushOnBoard( Board::UP ); return;
+   case GLFW_KEY_DOWN: pushOnBoard( Board::DOWN ); return;
+   case GLFW_KEY_LEFT: pushOnBoard( Board::LEFT ); return;
+   case GLFW_KEY_RIGHT: pushOnBoard( Board::RIGHT ); return;
+   case GLFW_KEY_ESCAPE: glfwSetWindowShouldClose( window_.get(), GL_TRUE ); return;
 
-	if (action == GLFW_PRESS){
-		switch(key){
-			case GLFW_KEY_UP: pushOnBoard(Board::UP); return;
-			case GLFW_KEY_DOWN: pushOnBoard(Board::DOWN); return;
-			case GLFW_KEY_LEFT: pushOnBoard(Board::LEFT); return;
-			case GLFW_KEY_RIGHT: pushOnBoard(Board::RIGHT); return;
-			case GLFW_KEY_ESCAPE: glfwSetWindowShouldClose(window_.get(), GL_TRUE); return;
-		}
-	}
+    // DEBUG KEYS
+   case GLFW_KEY_F1: isEnd_ = true; // F1: forces game over screen
+  }
+ }
 }
 
-void Application::Impl_::clickEvent()
+#define IS_MOUSE_IN_RECTANGLE( mX, mY, rect ) ( mX <= ( rect.x + rect.width / 2.0f ) && mX >= ( rect.x - rect.width / 2.0f )\
+                                                && mY <= ( rect.y + rect.height / 2.0f ) && mY >= ( rect.y - rect.height / 2.0f ) )
+
+void Application::Impl_::clickEvent( int button, int action, int mods )
 {
-	double* xpos, *ypos;
-	glfwGetCursorPos(window_.get(), xpos, ypos);
-	glfwDestroyWindow(window_.get());
+ double xpos = 0.0,
+        ypos = 0.0;
+
+ glfwGetCursorPos( window_.get(), &xpos, &ypos );
+
+ int winWidth = 0, winHeight = 0;
+ glfwGetWindowSize( window_.get(), &winWidth, &winHeight );
+ int fWidth = 0, fHeight = 0;
+ glfwGetFramebufferSize( window_.get(), &fWidth, &fHeight );
+ float pxRatio = ( float )fWidth / ( float )winWidth;
+
+ const Rect exitLabelRect = {
+  fWidth / 2.0f,
+  fHeight / 2.0f + 20.0f,
+  40.0f * pxRatio,
+  20.0f * pxRatio,
+ };
+
+ const Rect retryLabelRect = {
+  fWidth / 2.0f,
+  fHeight / 2.0f,
+  40.0f * pxRatio,
+  20.0f * pxRatio,
+ };
+	
+ if( button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS ) {
+  if( IS_MOUSE_IN_RECTANGLE( xpos, ypos, exitLabelRect ) )  glfwSetWindowShouldClose( window_.get(), GL_TRUE );
+  }
 }
 
 void Application::Impl_::pushOnBoard(Board::Direction direction){
