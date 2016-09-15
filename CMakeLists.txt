@@ -66,6 +66,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}/resources)
 # *********************************************
 set(SOURCES
 	main.cpp
+	save.cpp
 	application.cpp
 	nvg.cpp
 	glfw.cpp
