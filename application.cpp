@@ -127,6 +127,7 @@ void Application::Impl_::keyEvent(int key, int scancode, int action, int mods){
 			case GLFW_KEY_DOWN: pushOnBoard(Board::DOWN); return;
 			case GLFW_KEY_LEFT: pushOnBoard(Board::LEFT); return;
 			case GLFW_KEY_RIGHT: pushOnBoard(Board::RIGHT); return;
+			case GLFW_KEY_S: 
 			case GLFW_KEY_ESCAPE: glfwSetWindowShouldClose(window_.get(), GL_TRUE); return;
 		}
 	}
