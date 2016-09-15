@@ -15,8 +15,8 @@ private:
 	int *m_score;
 
 public:
-	SaveSystem(const vector<std::vector<Board::ContentValue> > &board, const int &score);
+	SaveSystem(const vector<vector<Board::ContentValue> > &board, const int &score = 0);
 	void save();
-	void assignBoard(const vector<std::vector<Board::ContentValue> > &board);
+	void assignBoard(const vector<vector<Board::ContentValue> > &board);
 	void assignScore(const int &score);
 };

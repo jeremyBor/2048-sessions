@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 #include <list>
+#include "save.h"
 
 class Board
 {
@@ -48,6 +49,8 @@ public:
 	std::vector<Pos> emptySquares() const;
 
 	Report push(Direction direction);
+
+	void saveTheBoard();
 
 private:
 	class Impl_;

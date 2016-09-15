@@ -288,3 +288,10 @@ std::vector<Board::Pos> Board::emptySquares() const {
 	return res;
 }
 
+
+
+void Board::saveTheBoard()
+{
+	SaveSystem saver(this->impl_->values_);//score);
+	saver.save();
+}

@@ -3,7 +3,7 @@
 
 
 
-SaveSystem::SaveSystem(const vector<std::vector<Board::ContentValue> > &board, const int &score)
+SaveSystem::SaveSystem(const vector<vector<Board::ContentValue> > &board, const int &score)
 {
 
 }
@@ -17,7 +17,7 @@ void SaveSystem::save()
 		{
 			for (int j = 0; j < 4; j++)
 			{
-				saveFile >> (int)m_board[i][j];
+				saveFile >> (*m_board)[i][j];
 			}
 		}
 		saveFile >> *m_score;
@@ -25,9 +25,9 @@ void SaveSystem::save()
 	saveFile.close();
 }
 
-void SaveSystem::assignBoard(const vector<std::vector<Board::ContentValue> > &board)
+void SaveSystem::assignBoard(const vector<vector<Board::ContentValue> > &board)
 {
-	m_board = (vector<std::vector<Board::ContentValue> >*)&board;
+	m_board = (vector<vector<Board::ContentValue> >*)&board;
 }
 
 void SaveSystem::assignScore(const int &score)
